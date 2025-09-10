@@ -1,0 +1,9 @@
+# pip install -r requirements.txt
+
+fastapi
+uvicorn
+pymongo
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
+requests
