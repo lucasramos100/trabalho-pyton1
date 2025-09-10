@@ -52,3 +52,19 @@ def logar(usuario: UsuarioLogin):
     )
 
     return {"token": access_token, "expires": timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)}
+
+@router.get("/listar_usuarios")
+def listar_usuarios(usuario=Depends(get_usuario_atual)):
+    lista = []
+    for user in usuarios.find():
+        lista.append({
+            "username": user["username"],
+            "cep": user["cep"],
+            "numero": user["numero"],
+            "complemento": user["complemento"],
+            "logradouro": user["logradouro"],
+            "bairro": user["bairro"],
+            "localidade": user["localidade"],
+            "uf": user["uf"],
+        })
+    return lista
