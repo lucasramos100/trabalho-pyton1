@@ -60,3 +60,35 @@ def listar_usuarios(usuario_atual=Depends(get_usuario_atual)):
         usuario["_id"] = str(usuario["_id"])
     return usuarios_lista
 
+@router.put("/user_id")
+def atualizar_usuario(user_id: str, usuario_dados: UsuarioCadastro, usuario_atual=Depends(get_usuario_atual)):
+    try:
+        user_obj_id = ObjectId(user_id)
+    except:
+        raise HTTPException(status_code=400, detail="ID de usuário inválido")
+    usuario_existente = usuarios.find_one({"_id": user_obj_id})
+    if not usuario_existente:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_dados.username != usuario_existente["username"]:
+        raise HTTPException(status_code=400, detail="Não é permitido alterar o username")
+
+    dadosCep = buscar_cep(usuario_dados.cep)
+    dados_atualizacao = {
+        "cep": usuario_dados.cep,
+        "numero": usuario_dados.numero,
+        "complemento": usuario_dados.complemento,
+        "logradouro": dadosCep["logradouro"],
+        "bairro": dadosCep["bairro"],
+        "localidade": dadosCep["localidade"],
+        "uf": dadosCep["uf"]
+    }
+    
+    if usuario_dados.password:
+        dados_atualizacao["password"] = gerar_hash(usuario_dados.password)
+    usuarios.update_one(
+        {"_id": user_obj_id},
+        {"$set": dados_atualizacao}
+    )
+    return {"mensagem": "Usuário atualizado com sucesso"}
+
+
