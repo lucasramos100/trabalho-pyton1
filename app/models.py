@@ -26,3 +26,9 @@ class UsuarioCadastro(BaseModel):
     cep: str
     numero: str
     complemento: str
+
+class UsuarioUpdate(BaseModel):
+    password: str | None = None
+    cep: str
+    numero: str
+    complemento: str
