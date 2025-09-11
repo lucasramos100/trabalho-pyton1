@@ -62,11 +62,6 @@ def listar_usuarios(usuario_atual=Depends(get_usuario_atual)):
 
 @router.put("/alterar_usuario")
 def atualizar_usuario(user_id: str, usuario_dados: UsuarioCadastro, usuario_atual=Depends(get_usuario_atual)):
-    try:
-        user_obj_id = ObjectId(user_id)
-    except:
-        raise HTTPException(status_code=400, detail="ID de usuário inválido")
-    usuario_existente = usuarios.find_one({"_id": user_obj_id})
     if usuario_dados.username != usuario_existente["username"]:
         raise HTTPException(status_code=400, detail="Não é permitido alterar o username")
 
@@ -88,5 +83,16 @@ def atualizar_usuario(user_id: str, usuario_dados: UsuarioCadastro, usuario_atua
         {"$set": dados_atualizacao}
     )
     return {"mensagem": "Usuário atualizado!"}
+
+@router.delete("/deletar_usuario")
+def deletar_usuario(user_id: str, usuario_atual=Depends(get_usuario_atual)):
+    if not usuario_alvo:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if usuario_alvo["username"] == usuario_atual["username"]:
+        raise HTTPException(status_code=403, detail="Essa ação não é permitida")  
+    usuarios.delete_one(
+        {"_id": user_obj_id}
+    )
+    return {"mensagem": "Usuário deletado com sucesso"}
 
 
